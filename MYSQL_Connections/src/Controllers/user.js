@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
         }
 
         res.status(200).json({
-            message: "User updated successfully",
+            message: "User Deleted successfully",
             result
         });
 
