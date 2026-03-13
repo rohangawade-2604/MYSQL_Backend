@@ -4,6 +4,8 @@ const {Connection} = require("./config/db")
 const http = require("http")
 const cors = require("cors");
 const userRoutes = require("./src/Routes/userRoutes")
+const CRUDRoutes = require("./src/Routes/CRUDRoutes")
+const hierarchyroutes = require("./src/Routes/hierarchyroutes")
 
 dotenv.config()
 
@@ -18,6 +20,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api", userRoutes)
+app.use("/api", hierarchyroutes)
 
 const PORT = process.env.PORT || 5000
 
