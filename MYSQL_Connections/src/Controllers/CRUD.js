@@ -4,6 +4,9 @@ const {Connection} = require("../../config/db");
 
 const CRUD = async (req , res) => {
     
+    const {name , email, id} = req.body;
+
+    const query = "SELECT * FROM users"
 }
 
 module.exports = { CRUD }
