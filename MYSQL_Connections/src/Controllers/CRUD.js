@@ -20,4 +20,5 @@ const CRUD = async (req , res) => {
     })
 }
 
+
 module.exports = { CRUD }
