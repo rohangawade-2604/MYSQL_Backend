@@ -1,50 +1,6 @@
 const { queryAsync } = require("../Controllers/hierarchy");
 
 
-// --------formating concept of data 
-const formatHierarchy = (rows) => {
-  const slmMap = {};
-
-  rows.forEach((row) => {
-    if (!slmMap[row.SLMID]) {
-      slmMap[row.SLMID] = {
-        SLMID: row.SLMID,
-        SLMName: row.SLMName,
-        SLMHq: row.SLMHq,
-        SLMZone: row.SLMZone,
-        FLMs: []
-      };
-    }
-
-    const slm = slmMap[row.SLMID];
-
-    let flm = slm.FLMs.find((f) => f.FLMID === row.FLMID);
-
-    if (!flm) {
-      flm = {
-        FLMID: row.FLMID,
-        FLMName: row.FLMName,
-        FLMHq: row.FLMHq,
-        FLMZone: row.FLMZone,
-        MRs: []
-      };
-
-      slm.FLMs.push(flm);
-    }
-
-    if (row.MRID) {
-      flm.MRs.push({
-        MRID: row.MRID,
-        MRName: row.MRName,
-        MRHq: row.MRHq,
-        MRZone: row.MRZone
-      });
-    }
-  });
-
-  return Object.values(slmMap);
-};
-
 // nestedhierarchy concept 
 const nestedhierarchy = async (req, res) => {
   try {
@@ -136,4 +92,4 @@ const nestedhierarchy = async (req, res) => {
   }
 };
 
-module.exports = {nestedhierarchy ,formatHierarchy}
+module.exports = {nestedhierarchy}
