@@ -35,7 +35,6 @@ const uploadHierarchyExcel = async (req, res) => {
         TLMPassword,
         TLMHq,
         TLMZone,
-        TLMRegion,
         SLMID,
         SLMName,
         SLMPassword,
@@ -46,7 +45,6 @@ const uploadHierarchyExcel = async (req, res) => {
         FLMPassword,
         FLMHq,
         FLMZone,
-        FLMRegion,
         MRID,
         MRName,
         MRPassword,
@@ -54,35 +52,36 @@ const uploadHierarchyExcel = async (req, res) => {
         MRZone,
       } = row;
 
+      
       // Insert TLM (ignore if duplicate)
       const tlmQuery = `
         INSERT IGNORE INTO TLM
-        (TLMID, TLMName, TLMPassword, TLMHq, TLMZone, TLMRegion)
+        (TLMID, TLMName, TLMPassword, TLMHq, TLMZone, SLMID)
         VALUES (?, ?, ?, ?, ?, ?)
       `;
-      await queryAsync(tlmQuery, [
+      await queryAsync(tlmQuery,  [
         TLMID,
         TLMName,
         TLMPassword,
         TLMHq,
         TLMZone,
-        TLMRegion || null,
+        SLMID
       ]);
       console.log(`TLM Inserted: ${TLMID}`);
 
       // Insert SLM
       const slmQuery = `
         INSERT IGNORE INTO SLM
-        (SLMID, SLMName, SLMPassword, SLMHq, SLMZone)
-        VALUES (?, ?, ?, ?, ?)
+        (SLMID, SLMName, SLMPassword, SLMHq, SLMZone, FLMID)
+        VALUES (?, ?, ?, ?, ?, ?)
       `;
-      await queryAsync(slmQuery, [SLMID, SLMName, SLMPassword, SLMHq, SLMZone]);
+      await queryAsync(slmQuery,  [SLMID, SLMName, SLMPassword, SLMHq, SLMZone, FLMID]);
       console.log(`SLM Inserted: ${SLMID}`);
 
       // Insert FLM
       const flmQuery = `
         INSERT IGNORE INTO FLM
-        (FLMID, FLMName, FLMPassword, FLMHq, FLMZone, FLMRegion)
+        (FLMID, FLMName, FLMPassword, FLMHq, FLMZone, MRID)
         VALUES (?, ?, ?, ?, ?, ?)
       `;
       await queryAsync(flmQuery, [
@@ -91,7 +90,7 @@ const uploadHierarchyExcel = async (req, res) => {
         FLMPassword,
         FLMHq,
         FLMZone,
-        FLMRegion || null,
+        MRID
       ]);
       console.log(`FLM Inserted: ${FLMID}`);
 
@@ -104,6 +103,8 @@ const uploadHierarchyExcel = async (req, res) => {
       await queryAsync(mrQuery, [MRID, MRName, MRPassword, MRHq, MRZone]);
       console.log(`MR Inserted: ${MRID}`);
     }
+
+
 
     // Delete uploaded file asynchronously
     fs.unlink(req.file.path, (err) => {
