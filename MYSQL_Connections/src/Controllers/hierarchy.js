@@ -119,4 +119,4 @@ const uploadHierarchyExcel = async (req, res) => {
   }
 };
 
-module.exports = { uploadHierarchyExcel };
+module.exports = { uploadHierarchyExcel, queryAsync };

@@ -6,6 +6,8 @@ const cors = require("cors");
 const userRoutes = require("./src/Routes/userRoutes")
 const CRUDRoutes = require("./src/Routes/CRUDRoutes")
 const hierarchyroutes = require("./src/Routes/hierarchyroutes")
+const loginRoutes = require("./src/Routes/loginRoutes")
+const nestedhierarchyroutes = require("./src/Routes/nestedhierarchyroutes")
 
 dotenv.config()
 
@@ -21,6 +23,8 @@ app.get("/", (req, res) => {
 
 app.use("/api", userRoutes)
 app.use("/api", hierarchyroutes)
+app.use("/api", loginRoutes)
+app.use("/api", nestedhierarchyroutes, )
 
 const PORT = process.env.PORT || 5000
 
