@@ -20,7 +20,7 @@ const fullhierarchy = async() => {
 
         return res.json({
             success: true,
-            count: result.length;
+            count: result.length,
             data: result
         });
 
