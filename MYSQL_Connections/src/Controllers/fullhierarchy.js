@@ -1,35 +1,59 @@
-const {queryAsync} = require("../Controllers/hierarchy.js")
+const { queryAsync } = require("../Controllers/hierarchy.js");
 
-const fullhierarchy = async() => {
+const fullhierarchy = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
-    try {
-        
-        const query = `SELECT 
-        T.TLMID, T.TLMName, T.TLMPassword, T.TLMHq, T.TLMZone,
-        S.SLMID, S.TLMName, S.SLMPassword, S.SLMHq, S.SLMZone,
-        F.FLMID, F.FLMName, F.FLMPassword, F.FLMHq, F.FLMZone,
-        M.MRID, M.MRName, M.MRPassword, M.MRHq, M.MRZone,
+    const offset = (page - 1) * limit;
 
-        FROM TLM T
-        LEFT JOIN SLM S ON T.SLMID = S.SLMID
-        LEFT JOIN FLM F ON S.FLMID = F.FLMID
-        LEFT JOIN MR M ON F.MLMID = M.MRID
+    const query = `
+        SELECT
+        T.TLMID,
+        T.TLMName,
+        T.TLMPassword,
+  T.TLMHq,
+  T.TLMZone,
+
+  S.SLMID,
+  S.SLMName,
+  S.SLMPassword,
+  S.SLMHq,
+  S.SLMZone,
+
+  F.FLMID,
+  F.FLMName,
+  F.FLMPassword,
+  F.FLMHq,
+  F.FLMZone,
+
+  M.MRID,
+  M.MRName,
+  M.MRPassword,
+  M.MRHq,
+  M.MRZone
+
+FROM TLM T
+LEFT JOIN SLM S ON T.SLMID = S.SLMID
+LEFT JOIN FLM F ON S.FLMID = F.FLMID
+LEFT JOIN MR M ON F.MRID = M.MRID
         `;
 
-        const result = await queryAsync(query);
+    const result = await queryAsync(query);
 
-        return res.json({
-            success: true,
-            count: result.length,
-            data: result
-        });
+    return res.json({
+      page,
+      limit,
+      success: true,
+      count: result.length,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "error is been occured",
+      error: error.message,
+    });
+  }
+};
 
-    } catch (error) {
-        res.status(500).json({
-            message: "error is been occured",
-            error: error.message
-        })
-    }
-}
-
-module.exports = {fullhierarchy}
+module.exports = { fullhierarchy };

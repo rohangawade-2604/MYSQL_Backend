@@ -9,6 +9,7 @@ const hierarchyroutes = require("./src/Routes/hierarchyroutes")
 const loginRoutes = require("./src/Routes/loginRoutes")
 const nestedhierarchyroutes = require("./src/Routes/nestedhierarchyroutes")
 const profileRoutes = require("./src/Routes/profileRoutes")
+const fullhierarchyroutes = require("./src/Routes/fullhierarchyroutes")
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ app.use("/api", hierarchyroutes)
 app.use("/api", loginRoutes)
 app.use("/api", nestedhierarchyroutes )
 app.use("/api", profileRoutes)
+app.use("/api", fullhierarchyroutes)
 
 const PORT = process.env.PORT || 5000
 
