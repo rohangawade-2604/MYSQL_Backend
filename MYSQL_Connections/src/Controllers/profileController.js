@@ -163,8 +163,103 @@ const GetUserByRoleController = async(req, res) => {
   }
 };
 
+
+const updateUserDetails = async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    const { name, hq, zone } = req.body;
+
+    // ✅ Validation
+    if (!name || !hq || !zone) {
+      return res.status(400).json({
+        success: false,
+        message: "name, hq, and zone are required",
+      });
+    }
+
+    // ✅ Table + Column Mapping
+    const tables = [
+      {
+        table: "TLM",
+        idCol: "uuid",
+        nameCol: "TLMName",
+        hqCol: "TLMHq",
+        zoneCol: "TLMZone",
+      },
+      {
+        table: "SLM",
+        idCol: "uuid",
+        nameCol: "SLMName",
+        hqCol: "SLMHq",
+        zoneCol: "SLMZone",
+      },
+      {
+        table: "FLM",
+        idCol: "uuid",
+        nameCol: "FLMName",
+        hqCol: "FLMHq",
+        zoneCol: "FLMZone",
+      },
+      {
+        table: "MR",
+        idCol: "uuid",
+        nameCol: "MRName",
+        hqCol: "MRHq",
+        zoneCol: "MRZone",
+      },
+    ];
+
+    // ✅ Loop through tables
+    for (let item of tables) {
+      const checkQuery = `SELECT ${item.idCol} FROM ${item.table} WHERE ${item.idCol} = ?`;
+
+      const [rows] = await Connection.promise().query(checkQuery, [uuid]);
+
+      // ✅ If user found in this table
+      if (rows.length > 0) {
+        const updateQuery = `
+          UPDATE ${item.table}
+          SET ${item.nameCol} = ?, 
+              ${item.hqCol} = ?, 
+              ${item.zoneCol} = ?
+          WHERE ${item.idCol} = ?
+        `;
+
+        await Connection.promise().query(updateQuery, [
+          name,
+          hq,
+          zone,
+          uuid,
+        ]);
+
+        return res.status(200).json({
+          success: true,
+          message: "User updated successfully",
+          table: item.table,
+        });
+      }
+    }
+
+    // ❌ If not found in any table
+    return res.status(404).json({
+      success: false,
+      message: "User not found in any table",
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   UpdateProfileController,
   deleteProfileController,
-  GetUserByRoleController
+  GetUserByRoleController,
+  updateUserDetails
 };
