@@ -1,4 +1,5 @@
 const { Connection } = require("../../config/db");
+const { connect } = require("../Routes/profileRoutes");
 // const uuid = require("uuid")
 
 const UpdateProfileController = async (req, res) => {
@@ -54,6 +55,116 @@ const UpdateProfileController = async (req, res) => {
   }
 };
 
+
+const deleteProfileController = async(req, res) => {
+  try {
+
+    const {uuid} = req.params;
+
+    // if(!req.file) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Profile picture is required here"
+    //   })
+    // }
+
+    // const profilePic = req.file.filename;
+
+    const tables = [
+      {table: "TLM", column: "uuid"},
+      {table: "SLM", column: "uuid"},
+      {table: "FLM", column: "uuid"},
+      {table: "MR", column: "uuid"},
+    ]
+
+    for(let item of tables){
+      const checkQuery = `SELECT uuid FROM ${item.table} WHERE ${item.column} = ?`;
+
+      const [row] = await Connection.promise().query(checkQuery,[uuid]);
+
+      console.log("Searching in ", item.table);
+      console.log("Result we got", row);
+      
+      
+      if(row.length > 0){
+        const DeleteQuery = `UPDATE ${item.table} SET profile_pic = NULL WHERE ${item.column} = ?`
+
+        await Connection.promise().query(DeleteQuery, [uuid]);
+
+        return res.status(200).json({
+          success: true,
+          message: "Profile picture is been Delete successfully ...!!!",
+          table: item.table,
+          uuid: uuid,
+        })
+      }
+    }
+
+    return res.status(404).json({
+      success: false,
+      message: "User not found anywhere..!!!",
+    })
+
+  } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Server error is been occured",
+        error: error.message,
+      })    
+  }
+}
+
+
+const GetUserByRoleController = async(req, res) => {
+  try {
+
+    const {uuid, id} = req.params;
+
+    const roleTableMap = {
+      TLM: "TLM",
+      SLM: "SLM",
+      FLM: "FLM",
+      MR: "MR",
+    }
+
+    const tablename = roleTableMap[id];
+
+
+    if(!tablename){
+      return res.status(400).json({
+        success: false,
+        message: "invalid role provided"
+      });
+    }
+
+    const query = `SELECT * FROM ${tablename} WHERE uuid = ?`;
+
+    const [row] = await Connection.promise().query(query, [uuid]);
+
+    if(row.length === 0){
+      return res.status(404).json({
+        success: false,
+        message: "User not founded here",
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Data fetch Successfully ",
+      data: row[0],
+    })
+
+  } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Server Error is been occured",
+        error: error.message
+      })    
+  }
+};
+
 module.exports = {
   UpdateProfileController,
+  deleteProfileController,
+  GetUserByRoleController
 };
