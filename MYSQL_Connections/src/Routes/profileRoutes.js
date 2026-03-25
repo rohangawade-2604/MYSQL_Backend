@@ -12,7 +12,7 @@ const {updateUserDetails} = require("../Controllers/profileController")
 router.put("/update-profile/:uuid", profile.single("profile_pic"), UpdateProfileController);
 router.delete("/delete-profile/:uuid",  deleteProfileController);
 // router.delete("/user/:role/:uuid",  GetUserByRoleController);
-router.put("/user-details/:uuid",  updateUserDetails);hdjskahfjdsa
+router.put("/user-details/:uuid",  updateUserDetails);
 
 
 module.exports = router
