@@ -222,7 +222,7 @@ const updateUserDetails = async (req, res) => {
           SET ${item.nameCol} = ?, 
               ${item.hqCol} = ?, 
               ${item.zoneCol} = ?
-          WHERE ${item.idCol} = ?
+          WHERE ${item.idCol} = ?     
         `;
 
         await Connection.promise().query(updateQuery, [
@@ -257,9 +257,153 @@ const updateUserDetails = async (req, res) => {
 };
 
 
+const getPerHoursData = async(req, res) => {
+
+  try {
+    
+    const tables = [
+      {
+        table: "TLM",
+        nameCol: "TLMName",
+        hqCol: "TLMHq",
+        zoneCol: "TLMZone",
+      },
+      {
+        table: "SLM",
+        nameCol: "SLMName",
+        hqCol: "SLMHq",
+        zoneCol: "SLMZone",
+      },
+      {
+        table: "FLM",
+        nameCol: "FLMName",
+        hqCol: "FLMHq",
+        zoneCol: "FLMZone",
+      },
+      {
+        table: "MR",
+        nameCol: "MRName",
+        hqCol: "MRHq",
+        zoneCol: "MRZone",
+      },
+    ]
+
+    let finalData = [];
+
+    for(let item of tables){
+      const query = `SELECT *,
+       '${item.table}' AS role
+      FROM ${item.table}
+      WHERE modified_at >= NOW() - INTERVAL 45 MINUTE`;
+
+      const [row] = await Connection.promise().query(query);
+
+      finalData = [...finalData, ...row];
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "found late 3 hours Data in it",
+      count:finalData.length,
+      data: finalData,
+    })
+
+  } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Server is been crashed today ",
+        error: error.message
+      })    
+  }
+}
+
+const getUserwithQuery = async(req, res) => {
+  try {
+
+    const {name, hq, zone} = req.query;
+
+    let finalData = []
+
+    const tables = [
+      {
+        table: "TLM",
+        nameCol: "TLMName",
+        hqCol: "TLMHq",
+        zoneCol: "TLMZone",
+      },
+      {
+        table: "SLM",
+        nameCol: "SLMName",
+        hqCol: "SLMHq",
+        zoneCol: "SLMZone",
+      },
+      {
+        table: "FLM",
+        nameCol: "FLMName",
+        hqCol: "FLMHq",
+        zoneCol: "FLMZone",
+      },
+      {
+        table: "MR",
+        nameCol: "MRName",
+        hqCol: "MRHq",
+        zoneCol: "MRZone",
+      },
+    ]
+
+    
+
+    for(let item of tables){
+      
+      let query = `
+      SELECT * FROM
+      ${item.table}
+      WHERE modified_at >= NOW() - INTERVAL 3 HOUR
+      `
+
+      let values = [];
+
+      if(name){
+        query += ` AND ${item.nameCol} LIKE ?`;
+        values.push(`%${name}%`)
+      }
+
+      if(hq){
+        query += ` AND ${item.hqCol} LIKE ?`;
+        values.push(`%${hq}%`)
+      }
+
+      if(zone){
+        query += ` AND ${item.zoneCol} LIKE ?`;
+        values.push(`%${zone}%`)
+      }
+
+      const [row] = await Connection.promise().query(query, values);
+
+      finalData = [...finalData, ...row];
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "you got the answer here",
+      data: finalData,
+    })
+
+  } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "L lag gaye bhaaiiii",
+        error: error.message,
+      })    
+  }
+}
+
+
 module.exports = {
   UpdateProfileController,
   deleteProfileController,
   GetUserByRoleController,
-  updateUserDetails
+  updateUserDetails,
+  getPerHoursData,
+  getUserwithQuery
 };
