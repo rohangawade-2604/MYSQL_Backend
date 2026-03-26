@@ -5,11 +5,13 @@ const http = require("http")
 const cors = require("cors");
 const userRoutes = require("./src/Routes/userRoutes")
 const CRUDRoutes = require("./src/Routes/CRUDRoutes")
+
 const hierarchyroutes = require("./src/Routes/hierarchyroutes")
 const loginRoutes = require("./src/Routes/loginRoutes")
 const nestedhierarchyroutes = require("./src/Routes/nestedhierarchyroutes")
 const profileRoutes = require("./src/Routes/profileRoutes")
-const fullhierarchyroutes = require("./src/Routes/fullhierarchyroutes")
+const fullhierarchyroutes = require("./src/Routes/fullhierarchyroutes");
+const { read } = require("fs");
 
 dotenv.config()
 
@@ -23,6 +25,7 @@ app.get("/", (req, res) => {
     console.log("bhetla bhai response");  
 })
 
+app.use("/api", CRUDRoutes)
 app.use("/api", userRoutes)
 app.use("/api", hierarchyroutes)
 app.use("/api", loginRoutes)

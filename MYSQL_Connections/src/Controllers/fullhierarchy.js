@@ -12,31 +12,31 @@ const fullhierarchy = async (req, res) => {
         T.TLMID,
         T.TLMName,
         T.TLMPassword,
-  T.TLMHq,
-  T.TLMZone,
+        T.TLMHq,
+        T.TLMZone,
 
-  S.SLMID,
-  S.SLMName,
-  S.SLMPassword,
-  S.SLMHq,
-  S.SLMZone,
+        S.SLMID,
+        S.SLMName,
+        S.SLMPassword,
+        S.SLMHq,
+        S.SLMZone,
 
-  F.FLMID,
-  F.FLMName,
-  F.FLMPassword,
-  F.FLMHq,
-  F.FLMZone,
+        F.FLMID,
+        F.FLMName,
+        F.FLMPassword,
+        F.FLMHq,
+        F.FLMZone,
 
-  M.MRID,
-  M.MRName,
-  M.MRPassword,
-  M.MRHq,
-  M.MRZone
+        M.MRID,
+        M.MRName,
+        M.MRPassword,
+        M.MRHq,
+        M.MRZone
 
-FROM TLM T
-LEFT JOIN SLM S ON T.SLMID = S.SLMID
-LEFT JOIN FLM F ON S.FLMID = F.FLMID
-LEFT JOIN MR M ON F.MRID = M.MRID
+        FROM TLM T
+        LEFT JOIN SLM S ON T.SLMID = S.SLMID
+        LEFT JOIN FLM F ON S.FLMID = F.FLMID
+        LEFT JOIN MR M ON F.MRID = M.MRID
         `;
 
     const result = await queryAsync(query);

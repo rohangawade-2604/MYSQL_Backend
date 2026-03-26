@@ -2,9 +2,10 @@ const express = require("express");
 
 const routes = express.Router();
 
-const {CRUD} = require("../Controllers/CRUD");
+// const {read} = require("../Controllers/CRUD");
 
-routes.get("/users/:id", CRUD)
+
+// routes.get('/read', read)
 
 
 module.exports = routes

@@ -399,11 +399,131 @@ const getUserwithQuery = async(req, res) => {
 }
 
 
+const deleteuser = async(req, res) => {
+  
+  try {
+    
+    const { uuid } = req.params
+  const { confirm } = req.query
+
+  if(confirm !== "true"){
+    return res.status(400).json({
+      success: false,
+      message: "please confirm deletion after by adding ?confirm=true"
+    })
+  }
+
+  const tables = [
+    {table: "TLM", idCol: "uuid"},
+    {table: "SLM", idCol: "uuid"},
+    {table: "FLM", idCol: "uuid"},
+    {table: "MR", idCol: "uuid"},
+  ]
+
+  for(let item of tables){
+    const checkQuery = `
+    SELECT ${item.idCol}
+    FROM ${item.table}
+    WHERE ${item.idCol} =? 
+    `
+
+    const [row] = await Connection.promise().query(checkQuery, [uuid]);
+
+    if(row.length > 0){
+      const deleteQuery = `
+      DELETE FROM ${item.table}
+      WHERE ${item.idCol} = ?
+      `
+
+      await Connection.promise().query(deleteQuery, [uuid])
+
+      return res.status(200).json({
+        success: true,
+        message: "User Deleted Successfully",
+        table: item.table,
+      })
+    }
+  }
+
+  return res.status(404).json({
+    success: false,
+    message: "user not found",
+  })
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "error in server",
+      error: error.message,
+    })    
+  }
+}
+
+
+const mrchanges = async(req, res) => {
+  try {
+    const {mrId , newFlmId} = req.body;
+
+    //validation part
+    if(!mrId || !newFlmId){
+      return res.status(400).json({
+        success: false,
+        message: "mrId and newFlmId are required"
+      })
+    }
+
+    const [mrRows] = await Connection.promise().query(
+      `SELECT MRID , FLMID FROM MR WHERE MRID = ?`, [mrId]
+    );
+
+    if(mrRows.length === 0){
+      return res.status(404).json({
+        success: false,
+        message: "MR not found here",
+      })
+    }
+
+    const oldFLmId = mrRows[0].FLMID;
+
+    // check FLM exist or not 
+    const [flmRows] = await Connection.promise().query(
+      `SELECT FLMID FROM FLM WHERE FLMID = ?`,[newFlmId]
+    )
+
+    if(flmRows.length === 0){
+      return res.status(404).json({
+        success: false,
+        message: "New flm id not found here",
+      })
+    }
+
+    await Connection.promise().query(
+      `UPDATE MR SET FLMID = ? WHERE MRID = ?`, [newFlmId,mrId]
+    )
+    
+
+    return res.status(200).json({
+      success: true,
+      message: `MR shifted from FLM ${oldFLmId} to FLM ${newFlmId}`,
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error is been occured",
+      error: error.message,
+    })
+  }
+}
+
+
 module.exports = {
   UpdateProfileController,
   deleteProfileController,
   GetUserByRoleController,
   updateUserDetails,
   getPerHoursData,
-  getUserwithQuery
+  getUserwithQuery,
+  deleteuser,
+  mrchanges
 };
